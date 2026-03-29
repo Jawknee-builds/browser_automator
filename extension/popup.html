@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            width: 200px;
+            padding: 1rem;
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+        button:hover { background: #4f46e5; }
+        p { font-size: 0.8rem; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <h3>Automator AI Pro</h3>
+    <p>Ready for business.</p>
+    <button id="open-sidebar">Open Side Panel</button>
+    <script>
+        document.getElementById('open-sidebar').onclick = () => {
+            chrome.sidePanel.setOptions({ enabled: true });
+            chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+        };
+    </script>
+</body>
+</html>

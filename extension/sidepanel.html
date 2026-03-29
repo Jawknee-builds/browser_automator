@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AUTOMATOR AI Pro</title>
+    <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+    <div id="root">
+        <header>
+            <h1>AUTOMATOR AI</h1>
+            <p>Pro Business Automation</p>
+        </header>
+
+        <section id="input-area">
+            <textarea id="prompt-input" placeholder="What business task should I handle? (e.g. 'Research this LinkedIn profile and add to Google Sheets')"></textarea>
+            
+            <div id="schedule-controls">
+                <label>
+                    <input type="checkbox" id="schedule-toggle"> Schedule for later
+                </label>
+                <input type="datetime-local" id="schedule-time" style="display: none;">
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+                <button id="execute-btn" style="flex: 2;">Execute Now</button>
+                <button id="stop-btn" style="flex: 1; background: #ef4444; display: none;">Stop</button>
+            </div>
+        </section>
+
+        <section id="scheduled-tasks-container" style="display: none; margin-bottom: 1.5rem;">
+            <div id="logs-header">
+                <h3>Upcoming Tasks</h3>
+            </div>
+            <div id="scheduled-tasks-list">
+                <!-- Scheduled tasks will appear here -->
+            </div>
+        </section>
+
+        <section id="logs-container">
+            <div id="logs-header">
+                <h3>Live Execution Log</h3>
+                <span id="status-badge" class="idle">Idle</span>
+            </div>
+            <div id="logs">
+                <div class="log-entry">Waiting for input...</div>
+            </div>
+        </section>
+    </div>
+    <script src="sidepanel.js"></script>
+</body>
+</html>

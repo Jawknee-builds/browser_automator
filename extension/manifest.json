@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "AUTOMATOR AI Pro",
+  "version": "1.0",
+  "description": "Professional Business Automation Agent",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "sidePanel",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_icon": {
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  }
+}

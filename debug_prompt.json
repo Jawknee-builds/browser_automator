@@ -1,0 +1,406 @@
+{
+  "timestamp": "2026-03-28T10:37:38.225Z",
+  "prompt": "okay now go to gemini and paste each job in my saved jobs's link and ask it to give my i think i fit for thenroel it gvie and u paste it and apply and share my intervie with them  option on",
+  "interactiveMap": [
+    {
+      "aria": "Wellfound",
+      "id": "automator-0",
+      "role": "",
+      "tag": "A",
+      "text": "Wellfound",
+      "visible": true
+    },
+    {
+      "aria": "Search everything",
+      "id": "automator-1",
+      "role": "text",
+      "tag": "INPUT",
+      "text": "Search",
+      "visible": true
+    },
+    {
+      "aria": "Notifications",
+      "id": "automator-2",
+      "role": "submit",
+      "tag": "BUTTON",
+      "text": "Notifications",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-3",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Ready to interview",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-6",
+      "role": "",
+      "tag": "A",
+      "text": "Home",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-7",
+      "role": "",
+      "tag": "A",
+      "text": "Profile",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-8",
+      "role": "",
+      "tag": "A",
+      "text": "Jobs",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-9",
+      "role": "",
+      "tag": "A",
+      "text": "Applied",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-10",
+      "role": "",
+      "tag": "A",
+      "text": "Messages",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-11",
+      "role": "",
+      "tag": "A",
+      "text": "Discover",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-12",
+      "role": "",
+      "tag": "A",
+      "text": "On-Demand",
+      "visible": true
+    },
+    {
+      "aria": "Browse all",
+      "id": "automator-13",
+      "role": "",
+      "tag": "A",
+      "text": "Browse all",
+      "visible": true
+    },
+    {
+      "aria": "Saved",
+      "id": "automator-14",
+      "role": "",
+      "tag": "A",
+      "text": "Saved\n53",
+      "visible": true
+    },
+    {
+      "aria": "Hidden",
+      "id": "automator-15",
+      "role": "",
+      "tag": "A",
+      "text": "Hidden",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-16",
+      "role": "",
+      "tag": "A",
+      "text": "CB Insights\nActively Hiring\nIdentifying and Respon",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-18",
+      "role": "",
+      "tag": "A",
+      "text": "CB Insights",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-19",
+      "role": "",
+      "tag": "A",
+      "text": "Senior Product Manager, Data Strategy\nRemoteNew Yo",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-20",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-21",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Learn more",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-22",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Report",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-23",
+      "role": "",
+      "tag": "A",
+      "text": "Nova Intelligence\nActively Hiring\nAgentic AI Platf",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-25",
+      "role": "",
+      "tag": "A",
+      "text": "Nova Intelligence",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-26",
+      "role": "",
+      "tag": "A",
+      "text": "SAP Engineer\nRemote onlyEverywhere$80k – $145k • 0",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-27",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-28",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Learn more",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-29",
+      "role": "",
+      "tag": "A",
+      "text": "Software Engineer\nRemote onlyEverywhere$125k – $20",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-30",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-31",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Learn more",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-32",
+      "role": "",
+      "tag": "A",
+      "text": "Chief of Staff\nRemote onlyEverywhere$80k – $125k •",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-33",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-34",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Learn more",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-35",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Report",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-36",
+      "role": "",
+      "tag": "A",
+      "text": "Nutrisense\nActively Hiring\nPersonalized data-drive",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-38",
+      "role": "",
+      "tag": "A",
+      "text": "Nutrisense",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-39",
+      "role": "",
+      "tag": "A",
+      "text": "Head of Growth\nRemote onlyEverywhere$110k – $150k",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-40",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-41",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Learn more",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-42",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Report",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-43",
+      "role": "",
+      "tag": "A",
+      "text": "LotusPetal AI\nActively Hiring\nLotusPetal AI automa",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-45",
+      "role": "",
+      "tag": "A",
+      "text": "LotusPetal AI",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-46",
+      "role": "",
+      "tag": "A",
+      "text": "Data Engineering Intern\nOnsite or remoteAustinChic",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-47",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-48",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Learn more",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-49",
+      "role": "",
+      "tag": "A",
+      "text": "Senior Sales Development Manager- Founding SDR (Gr",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-50",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-51",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Learn more",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-52",
+      "role": "",
+      "tag": "A",
+      "text": "Sales Development Representative - Founding SDR (G",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-53",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Remove",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-54",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Learn more",
+      "visible": true
+    },
+    {
+      "aria": "",
+      "id": "automator-55",
+      "role": "button",
+      "tag": "BUTTON",
+      "text": "Report",
+      "visible": true
+    }
+  ]
+}
