@@ -6,7 +6,7 @@ const scheduleToggle = document.getElementById('schedule-toggle');
 const scheduleTime = document.getElementById('schedule-time');
 const scheduledContainer = document.getElementById('scheduled-tasks-container');
 const scheduledList = document.getElementById('scheduled-tasks-list');
-
+const wellfoundBtn = document.getElementById('wellfound-autopilot');
 const stopBtn = document.getElementById('stop-btn');
 let isRunning = false;
 
@@ -169,6 +169,69 @@ executeBtn.addEventListener('click', async () => {
             resetState(isRunning ? 'Finished' : 'Stopped');
             if (isRunning) addLog('Automation complete!', 'success');
         });
+    });
+});
+
+wellfoundBtn.addEventListener('click', async () => {
+    isRunning = true;
+    statusBadge.textContent = 'Scraping Job...';
+    statusBadge.className = 'running';
+    addLog('Locating job details on page...', 'info');
+
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    // 1. Scrape Wellfound
+    chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_WELLFOUND' }, async (response) => {
+        if (!response || !response.success) {
+            addLog("Couldn't scrape job info. Ensure you're on a Wellfound job page.", 'error');
+            return resetState('Error');
+        }
+
+        const { jobTitle, companyName, description } = response.data;
+        addLog(`Scraped: ${jobTitle} @ ${companyName}`, 'success');
+        statusBadge.textContent = 'Consulting Qwen...';
+
+        // 2. Generate Note via Backend (Qwen)
+        try {
+            const res = await fetch('http://localhost:3001/api/generate-job-note', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jobInfo: `${jobTitle} at ${companyName}. Description: ${description}`,
+                    userBackground: "Industrial Engineering at MIT Manipal, GoPerch TPM, YOLO/Raspberry Pi project"
+                })
+            });
+            const { note } = await res.json();
+            addLog(`Qwen Note Generated!`, 'success');
+            addLog(`"${note.substring(0, 50)}..."`, 'info');
+
+            // 3. Plan the drafting steps
+            statusBadge.textContent = 'Drafting...';
+            // Note: In refined mode, we could use the note directly in an EXECUTE_STEP.
+            // For now, we'll use the existing planner but force the note into the prompt.
+            const prompt = `Apply for this job: ${jobTitle} at ${companyName}. Use this note: "${note}".`;
+            
+            chrome.runtime.sendMessage({ 
+                type: "GET_PLAN", 
+                prompt,
+                context: { title: jobTitle, currentTabId: tab.id }
+            }, async (planRes) => {
+                if (!planRes || !planRes.success) return resetState('Error');
+                
+                for (const step of planRes.steps) {
+                    if (!isRunning) break;
+                    addLog(`Executing: ${step.action}...`, 'info');
+                    await new Promise(r => setTimeout(r, 1000 + Math.random() * 500));
+                    await sendExecuteMessage(step);
+                }
+                resetState('Complete');
+                addLog('Drafted! Review and click Send.', 'success');
+            });
+
+        } catch (e) {
+            addLog(`Error: ${e.message}`, 'error');
+            resetState('Error');
+        }
     });
 });
 

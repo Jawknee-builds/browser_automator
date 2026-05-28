@@ -37,7 +37,10 @@ export async function executeCommands(commands) {
           await page.click(cmd.selector, { timeout: 15000 });
           break;
         case 'type':
-          await page.fill(cmd.selector, cmd.text, { timeout: 15000 });
+          await page.click(cmd.selector);
+          for (const char of cmd.text) {
+            await page.type(cmd.selector, char, { delay: Math.floor(Math.random() * (185 - 75 + 1) + 75) });
+          }
           break;
         case 'press':
           await page.press(cmd.selector, cmd.key);

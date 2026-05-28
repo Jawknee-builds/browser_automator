@@ -1,23 +1,78 @@
-import Groq from 'groq-sdk';
 import { executeCommands } from './executor.js';
 import fs from 'fs';
+import dotenv from 'dotenv';
 
-let groq;
+dotenv.config();
 
-function getGroqClient() {
-  if (!groq) {
-    if (!process.env.GROQ_API_KEY) {
-      throw new Error("GROQ_API_KEY is missing from environment variables.");
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434/v1';
+const LOCAL_MODEL = process.env.LOCAL_MODEL || 'qwen2.5:1.5b';
+
+// Dual-mode LLM controller: dynamically switches between high-speed Groq Cloud LPU and offline local Ollama
+async function callLLM(messages, useJson = true) {
+  const groqKey = process.env.GROQ_API_KEY;
+  
+  if (groqKey) {
+    // 1. Enterprise Mode: Groq Cloud LPU (Ultra-fast, low-latency reasoning)
+    try {
+      console.log(`[LLM] Dispatching to Groq Cloud (llama-3.3-70b-versatile)...`);
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${groqKey}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: messages,
+          response_format: useJson ? { type: 'json_object' } : undefined,
+          temperature: 0.1
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`Groq API Error: ${err}`);
+      }
+      
+      const data = await response.json();
+      return data.choices[0].message.content;
+    } catch (error) {
+      console.error('[Groq] API Connection failed, trying local fallback...', error);
+      throw error;
     }
-    groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  } else {
+    // 2. Local Mode: Offline Ollama (Free-tier, zero-cost Qwen model)
+    try {
+      console.log(`[LLM] Dispatching to local Ollama (${LOCAL_MODEL})...`);
+      const response = await fetch(`${OLLAMA_URL}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: LOCAL_MODEL,
+          messages: messages,
+          response_format: useJson ? { type: 'json_object' } : undefined
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`Ollama Error: ${err}`);
+      }
+      
+      const data = await response.json();
+      return data.choices[0].message.content;
+    } catch (error) {
+      console.error('[Ollama] API Error: Local Ollama server offline.', error);
+      throw new Error(
+        "LLM Connection Failed: Local Ollama server is offline.\n" +
+        "👉 Start your local service by running: 'ollama run qwen2.5:1.5b'\n" +
+        "👉 Or, configure 'GROQ_API_KEY' in your .env file to enable instant Groq Cloud LPU (Llama 3.3-70B)."
+      );
+    }
   }
-  return groq;
 }
 
 export async function runAgent(prompt) {
-  const model = 'llama-3.3-70b-versatile'; 
-  const client = getGroqClient();
-  
   const systemPrompt = `
     You are a professional business automation agent. Your goal is to execute complex workflows in the browser.
     
@@ -31,29 +86,24 @@ export async function runAgent(prompt) {
 
     Business Context:
     The user is using their personal/business Chrome profile. Logins are likely already handled by the persistent session. 
-    Focus on accuracy and reliability. If a task involves multiple steps (e.g., "Find a contact on LinkedIn and save to sheets"), break it down logically.
-
-    Goal: "${prompt}"
-    IMPORTANT: Output ONLY a JSON array of steps. No extra text.
+    Focus on accuracy and reliability.
   `;
 
   try {
-    console.log(`[Agent] Planning professional workflow using ${model}...`);
-    const chatCompletion = await client.chat.completions.create({
-      messages: [{ role: 'user', content: systemPrompt }],
-      model: model,
-      response_format: { type: 'json_object' }
-    });
-
-    const text = chatCompletion.choices[0].message.content;
+    const activeModel = process.env.GROQ_API_KEY ? 'llama-3.3-70b' : LOCAL_MODEL;
+    console.log(`[Agent] Planning professional workflow using ${activeModel}...`);
+    
+    const text = await callLLM([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: prompt }
+    ]);
+    
     const jsonMatch = text.match(/\[.*\]/s);
     let steps;
     
     if (!jsonMatch) {
       const obj = JSON.parse(text);
-      if (Array.isArray(obj)) steps = obj;
-      else if (obj.steps) steps = obj.steps;
-      else throw new Error(`Planning failed. Received: ${text}`);
+      steps = obj.steps || (Array.isArray(obj) ? obj : []);
     } else {
       steps = JSON.parse(jsonMatch[0]);
     }
@@ -67,9 +117,8 @@ export async function runAgent(prompt) {
 }
 
 export async function getPlanOnly(prompt, context = {}) {
-  const model = 'llama-3.3-70b-versatile'; 
-  const client = getGroqClient();
-  console.log(`[Agent] Planning for prompt: "${prompt}"`);
+  const activeModel = process.env.GROQ_API_KEY ? 'llama-3.3-70b' : LOCAL_MODEL;
+  console.log(`[Agent] Planning for prompt: "${prompt}" using ${activeModel}`);
   
   const systemPrompt = `
     You are the "Master AI Browser Controller" (Comet-Class). You have full control over the entire browser session.
@@ -80,13 +129,11 @@ export async function getPlanOnly(prompt, context = {}) {
     
     STRATEGIC MENTAL MODEL:
     1. UNIVERSAL CONTROL: You can create, switch, and close tabs.
-    2. CROSS-TAB FLOW: If asked to "compare prices in two sites", you should: 1. Create a new tab for Site B, 2. Research, 3. Switch back to Tab A.
-    3. TARGETING: Every action takes a "tabId". If you don't specify it, it runs in the current tab.
+    2. TARGETING: Every action takes a "tabId".
     
     ALLOWED ACTIONS (ONLY USE THESE):
-    - { "action": "createTab", "url": "..." } -> Returns a new tabId.
-    - { "action": "switchTab", "tabId": ... } -> Focuses a tab.
-    - { "action": "closeTab", "tabId": ... }
+    - { "action": "createTab", "url": "..." }
+    - { "action": "switchTab", "tabId": ... }
     - { "action": "click", "tabId": ..., "selector": "[data-automator-id='...']" }
     - { "action": "type", "tabId": ..., "selector": "[data-automator-id='...']", "text": "..." }
     - { "action": "press", "tabId": ..., "selector": "[data-automator-id='...']", "key": "Enter" }
@@ -96,37 +143,35 @@ export async function getPlanOnly(prompt, context = {}) {
     INTERACTIVE ELEMENT MAP (FOR CURRENT TAB):
     ${JSON.stringify(context.interactiveMap || [], null, 2)}
 
-    GOAL: "${prompt}"
-    
     RESPONSE FORMAT:
     Output ONLY a JSON object with a "steps" key containing the flat array.
   `;
 
   try {
-    const debugData = { timestamp: new Date().toISOString(), prompt, interactiveMap: context.interactiveMap };
-    fs.writeFileSync('./debug_prompt.json', JSON.stringify(debugData, null, 2));
-
-    const chatCompletion = await client.chat.completions.create({
-      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: prompt }],
-      model: model,
-      response_format: { type: 'json_object' }
-    });
-
-    const text = chatCompletion.choices[0].message.content;
-    fs.writeFileSync('./debug_response.txt', text);
+    const text = await callLLM([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: prompt }
+    ]);
+    
     console.log(`[Agent] Raw LLM Response: ${text}`);
     
-    try {
-      const obj = JSON.parse(text);
-      const steps = obj.steps || obj.actions || (Array.isArray(obj) ? obj : []);
-      return { steps };
-    } catch (parseErr) {
-      console.error('[Agent] JSON Parsing failed!', parseErr);
-      console.log('[Agent] Problematic text:', text);
-      return { steps: [] };
-    }
+    const obj = JSON.parse(text);
+    const steps = obj.steps || obj.actions || (Array.isArray(obj) ? obj : []);
+    return { steps };
   } catch (err) {
     console.error('[Agent] Planning error:', err);
     throw err;
   }
+}
+
+// Specialized function for Wellfound Job Notes
+export async function generateJobNote(jobInfo, userBackground) {
+  const prompt = `
+    I'm applying for this job: ${jobInfo}. 
+    Based on my background (${userBackground}), write a 2-sentence 'Note to Founder' that is concise and highlights my industrial-tech blend. 
+    Do not include placeholders like [Name]. 
+    Output ONLY the note text.
+  `;
+  
+  return await callLLM([{ role: 'user', content: prompt }], false);
 }
