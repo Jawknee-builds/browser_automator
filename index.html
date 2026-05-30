@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vortex AI | Autonomous Browser Automation Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #05060f;
+            --chrome-bg: #1e1f29;
+            --chrome-tab-active: #2b2d3d;
+            --chrome-viewport-bg: #0c0d16;
+            --sidepanel-bg: #0f101b;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-glow: rgba(37, 99, 235, 0.35);
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --font-display: 'Outfit', sans-serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(220, 50%, 10%, 1) 0, transparent 60%),
+                radial-gradient(at 100% 100%, hsla(260, 45%, 8%, 1) 0, transparent 60%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Branding Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 4%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(5, 6, 15, 0.7);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.25);
+        }
+
+        .brand-logo i {
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .brand-text h1 {
+            font-family: var(--font-display);
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            color: #fff;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .github-link:hover {
+            border-color: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Simulator Frame Wrapper */
+        .simulator-outer {
+            max-width: 1500px;
+            width: 95%;
+            margin: 30px auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--chrome-bg);
+            display: flex;
+            flex-direction: column;
+            height: 820px;
+        }
+
+        /* Chrome Window Toolbar */
+        .chrome-header {
+            padding: 10px 16px;
+            background: var(--chrome-bg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chrome-tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 6px;
+            margin-right: 12px;
+        }
+
+        .win-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .win-dot.red { background: #ff5f56; }
+        .win-dot.yellow { background: #ffbd2e; }
+        .win-dot.green { background: #27c93f; }
+
+        .chrome-tab {
+            background: transparent;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px 8px 0 0;
+            font-size: 11.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 180px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chrome-tab.active {
+            background: var(--chrome-tab-active);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-bottom: none;
+        }
+
+        .chrome-tab i.close-icon {
+            font-size: 9px;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+
+        .chrome-tab i.close-icon:hover {
+            opacity: 1;
+        }
+
+        .chrome-nav-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chrome-nav-icons {
+            display: flex;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .chrome-nav-icons i {
+            cursor: pointer;
+        }
+
+        .chrome-nav-icons i:hover {
+            color: #fff;
+        }
+
+        .chrome-address-bar {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 12px;
+            color: #a78bfa;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chrome-address-bar i {
+            color: var(--success);
+        }
+
+        /* Inner Workspace: Web Viewport + AI Sidepanel */
+        .simulator-inner {
+            display: flex;
+            flex: 1;
+            position: relative;
+            background: var(--chrome-viewport-bg);
+            overflow: hidden;
+        }
+
+        /* 1. Mock Web Viewport (Wellfound Jobs Page) */
+        .web-viewport {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+            background: #090a10;
+        }
+
+        /* Visual Cursor Pointer */
+        .virtual-cursor {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(253, 224, 71, 0.4);
+            border: 2px solid #fde047;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px #fde047;
+            display: none;
+            transition: 
+                top 0.8s cubic-bezier(0.25, 1, 0.5, 1), 
+                left 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .virtual-cursor.clicking {
+            transform: translate(-50%, -50%) scale(0.7);
+            background: rgba(239, 68, 68, 0.6);
+            border-color: #ef4444;
+            box-shadow: 0 0 20px #ef4444;
+        }
+
+        /* Wellfound Page Structure */
+        .wf-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .wf-logo {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wf-logo span {
+            color: #2563eb;
+        }
+
+        .wf-filters {
+            display: flex;
+            gap: 8px;
+        }
+
+        .wf-input {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 11.5px;
+            width: 140px;
+        }
+
+        .wf-jobs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .wf-job-card {
+            background: rgba(13, 15, 30, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .wf-job-card:hover {
+            border-color: rgba(37, 99, 235, 0.3);
+            background: rgba(13, 15, 30, 0.8);
+        }
+
+        .wf-job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .wf-job-title h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .wf-job-title p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .wf-job-salary {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.08);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .wf-job-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .wf-tag {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .wf-apply-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wf-apply-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .wf-apply-btn.applied {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            cursor: not-allowed;
+        }
+
+        /* Interactive Overlay Modal Simulator */
+        .wf-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .wf-modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .wf-modal {
+            background: #12131e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 24px;
+            width: 420px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .wf-modal-overlay.active .wf-modal {
+            transform: scale(1);
+        }
+
+        .wf-modal h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .wf-modal p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .wf-modal textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            padding: 10px;
+            font-size: 12px;
+            font-family: var(--font-sans);
+            outline: none;
+            resize: none;
+            margin-bottom: 16px;
+        }
+
+        .wf-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .wf-modal-btn {
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .wf-modal-btn.cancel {
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .wf-modal-btn.submit {
+            background: #10b981;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+        }
+
+        /* Success Banners */
+        .wf-toast {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #10b981;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 12.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .wf-toast.active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* 2. AUTOMATOR AI Sidepanel (Mirrors sidepanel.html) */
+        .ai-sidepanel {
+            width: 380px;
+            background: var(--sidepanel-bg);
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidepanel-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .sidepanel-header h2 {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidepanel-header h2 i {
+            color: var(--accent);
+        }
+
+        .sidepanel-header p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        /* Inputs & Controls */
+        .sidepanel-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .textarea-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .textarea-wrapper label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .sidepanel-textarea {
+            width: 100%;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #fff;
+            padding: 10px;
+            font-size: 11.5px;
+            font-family: var(--font-sans);
+            outline: none;
+            resize: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidepanel-textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .sidepanel-btn {
+            width: 100%;
+            border: none;
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .sidepanel-btn.execute {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .sidepanel-btn.execute:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--primary-glow);
+        }
+
+        .sidepanel-btn.autopilot {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
+        }
+
+        .sidepanel-btn.autopilot:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+        }
+
+        .sidepanel-btn.stop {
+            background: var(--danger);
+            color: #fff;
+            display: none;
+        }
+
+        /* Config parameters slider */
+        .config-sliders {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .slider-group label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slider-group label span.val {
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .slider-control {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .slider-control::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+
+        /* Live console logs area */
+        .console-logs-card {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .console-header h3 {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .console-status-badge {
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .console-status-badge.idle {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: var(--text-muted);
+        }
+
+        .console-status-badge.scanning {
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            animation: pulse-badge 1.5s infinite;
+        }
+
+        .console-status-badge.executing {
+            background: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+        }
+
+        .console-status-badge.success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        @keyframes pulse-badge {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        .console-feed {
+            background: #06070c;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: #a78bfa;
+            overflow-y: auto;
+            flex: 1;
+            height: 180px;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .log-line {
+            display: flex;
+            gap: 8px;
+        }
+
+        .log-time {
+            color: #4b5563;
+        }
+
+        .log-tag {
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .log-text {
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-container">
+            <div class="brand-logo">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="brand-text">
+                <h1>Vortex AI Autopilot</h1>
+                <p>Observe-Plan-Execute Autonomous Browser Automation & Chrome Extension Simulator</p>
+            </div>
+        </div>
+        <a href="https://github.com/Jawknee-builds/browser_automator" target="_blank" class="github-link">
+            <i class="fa-brands fa-github"></i> View Extension Repository
+        </a>
+    </header>
+
+    <div class="simulator-outer">
+        <!-- Chrome Header Mock -->
+        <div class="chrome-header">
+            <div class="chrome-tabs">
+                <div class="window-controls">
+                    <div class="win-dot red"></div>
+                    <div class="win-dot yellow"></div>
+                    <div class="win-dot green"></div>
+                </div>
+                <div class="chrome-tab active">
+                    <i class="fa-solid fa-briefcase"></i> Wellfound Jobs <i class="fa-solid fa-xmark close-icon" style="margin-left: auto;"></i>
+                </div>
+                <div class="chrome-tab">
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn <i class="fa-solid fa-xmark close-icon" style="margin-left: auto;"></i>
+                </div>
+            </div>
+            
+            <div class="chrome-nav-bar">
+                <div class="chrome-nav-icons">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <i class="fa-solid fa-rotate-right"></i>
+                </div>
+                <div class="chrome-address-bar">
+                    <i class="fa-solid fa-lock"></i> https://wellfound.com/jobs/react-engineer
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulator Core -->
+        <div class="simulator-inner">
+            <!-- Simulated Virtual Pointer Cursor -->
+            <div class="virtual-cursor" id="cursorPointer"></div>
+
+            <!-- Virtual Web Viewport -->
+            <div class="web-viewport">
+                <!-- Toast Alert -->
+                <div class="wf-toast" id="wfToast">
+                    <i class="fa-solid fa-circle-check"></i> Application Submitted Successfully!
+                </div>
+
+                <div class="wf-header">
+                    <div class="wf-logo">wellfound<span>.</span></div>
+                    <div class="wf-filters">
+                        <input type="text" class="wf-input" value="React Developer" readonly>
+                        <input type="text" class="wf-input" value="Remote" readonly>
+                    </div>
+                </div>
+
+                <div class="wf-jobs-list">
+                    <!-- Job Card 1 -->
+                    <div class="wf-job-card" id="job-card-1">
+                        <div class="wf-job-header">
+                            <div class="wf-job-title">
+                                <h3>Senior React Engineer</h3>
+                                <p>Nova Labs • 3 days ago</p>
+                            </div>
+                            <div class="wf-job-salary">$120k – $140k</div>
+                        </div>
+                        <div class="wf-job-tags">
+                            <span class="wf-tag">React</span>
+                            <span class="wf-tag">Next.js</span>
+                            <span class="wf-tag">Tailwind CSS</span>
+                            <span class="wf-tag">Full-Time</span>
+                        </div>
+                        <button class="wf-apply-btn" id="apply-btn-1" onclick="triggerManualApply(1)">Apply Now</button>
+                    </div>
+
+                    <!-- Job Card 2 -->
+                    <div class="wf-job-card" id="job-card-2">
+                        <div class="wf-job-header">
+                            <div class="wf-job-title">
+                                <h3>AI Automation Architect</h3>
+                                <p>Zenith Systems • Today</p>
+                            </div>
+                            <div class="wf-job-salary">$140k – $170k</div>
+                        </div>
+                        <div class="wf-job-tags">
+                            <span class="wf-tag">Node.js</span>
+                            <span class="wf-tag">Puppeteer</span>
+                            <span class="wf-tag">OpenAI</span>
+                            <span class="wf-tag">Remote</span>
+                        </div>
+                        <button class="wf-apply-btn" id="apply-btn-2" onclick="triggerManualApply(2)">Apply Now</button>
+                    </div>
+
+                    <!-- Job Card 3 -->
+                    <div class="wf-job-card" id="job-card-3">
+                        <div class="wf-job-header">
+                            <div class="wf-job-title">
+                                <h3>Full Stack JavaScript Engineer</h3>
+                                <p>Vortex Tech • 1 week ago</p>
+                            </div>
+                            <div class="wf-job-salary">$110k – $130k</div>
+                        </div>
+                        <div class="wf-job-tags">
+                            <span class="wf-tag">React</span>
+                            <span class="wf-tag">Node.js</span>
+                            <span class="wf-tag">AWS</span>
+                            <span class="wf-tag">MongoDB</span>
+                        </div>
+                        <button class="wf-apply-btn" id="apply-btn-3" onclick="triggerManualApply(3)">Apply Now</button>
+                    </div>
+                </div>
+
+                <!-- Simulated Application Modal Overlay -->
+                <div class="wf-modal-overlay" id="wfModalOverlay">
+                    <div class="wf-modal">
+                        <h3 id="modal-job-title">Apply to Nova Labs</h3>
+                        <p style="font-size: 11px; margin-bottom: 12px; color: var(--text-muted);">Simulated cover letter sequence powered by LLM agent logic</p>
+                        <textarea id="modal-coverletter" placeholder="Cover letter will type here autonomously..."></textarea>
+                        <div class="wf-modal-actions">
+                            <button class="wf-modal-btn cancel" onclick="closeWfModal()">Cancel</button>
+                            <button class="wf-modal-btn submit" id="modal-submit-btn" onclick="submitWfApplication()">Submit Application</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUTOMATOR AI Extension Sidepanel -->
+            <div class="ai-sidepanel">
+                <div class="sidepanel-header">
+                    <h2><i class="fa-solid fa-wand-magic-sparkles"></i> AUTOMATOR AI</h2>
+                    <p>Pro Business Browser Autopilot</p>
+                </div>
+
+                <div class="sidepanel-content">
+                    <div class="textarea-wrapper">
+                        <label>Automation Objective</label>
+                        <textarea class="sidepanel-textarea" id="prompt-input" placeholder="Type what business task I should handle... (e.g. 'Scrape Wellfound jobs matching React Developer and click apply')">Scan the active Wellfound tab, identify all React Developer vacancies, formulate highly targeted cover letters for each company, and submit applications automatically.</textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="sidepanel-btn execute" onclick="runAutopilotSequence()" id="execute-btn" style="flex: 2;">
+                            <i class="fa-solid fa-play"></i> Execute Plan
+                        </button>
+                        <button class="sidepanel-btn stop" onclick="stopSequence()" id="stop-btn" style="flex: 1;">
+                            <i class="fa-solid fa-stop"></i> Stop
+                        </button>
+                    </div>
+
+                    <button class="sidepanel-btn autopilot" onclick="runAutopilotSequence()" id="autopilot-btn">
+                        <i class="fa-solid fa-robot"></i> Start Autopilot Sequence
+                    </button>
+
+                    <!-- Timing and delay controls -->
+                    <div class="config-sliders">
+                        <div class="slider-group">
+                            <label>Typing Speed Delay <span class="val" id="val-typing">90ms</span></label>
+                            <input type="range" class="slider-control" id="param-typing" min="30" max="250" value="90" oninput="document.getElementById('val-typing').innerText = this.value + 'ms'">
+                        </div>
+                        <div class="slider-group">
+                            <label>LLM Choice <span class="val" style="color: var(--accent); font-weight: 800;">Groq Cloud</span></label>
+                            <select class="wf-input" style="width: 100%; border-color: rgba(255,255,255,0.08); background: rgba(0,0,0,0.15);" id="param-llm">
+                                <option value="groq">Groq Cloud (Llama-3.3-70B)</option>
+                                <option value="ollama">Local Host (Ollama Qwen2.5)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Live logs feed box -->
+                    <div class="console-logs-card">
+                        <div class="console-header">
+                            <h3>Live Execution Log</h3>
+                            <span class="console-status-badge idle" id="statusBadge">Idle</span>
+                        </div>
+
+                        <div class="console-feed" id="consoleFeed">
+                            <div class="log-line">
+                                <span class="log-time">[12:15:00]</span>
+                                <span class="log-text">Waiting for autopilot command...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sequenceActive = false;
+        let timelineTimeout = null;
+
+        const coverLetterTexts = {
+            1: "Dear Nova Labs Hiring Team,\n\nI am writing to express my strong interest in the Senior React Engineer position. With extensive expertise in building high-performance glassmorphic user interfaces, custom telemetry panels, and deploying robust client-side React 19 frameworks, I am confident in my ability to immediately add value to your team. My experience aligns perfectly with your Next.js and Tailwind stack.\n\nBest regards,\nJawknee Buildic",
+            2: "Dear Zenith Systems Team,\n\nI am highly excited to apply for the AI Automation Architect role. I have extensive experience building Autonomous Agent structures, observing viewports, parsing layouts with Gemini 1.5 Flash, and executing human-like event loops in Node.js and Puppeteer. My latest project, Vortex AI, successfully implements dual-model LLM structures (Groq/Ollama) to manage complex geofences and applications.\n\nBest regards,\nJawknee Buildic"
+        };
+
+        function addLog(text, tag = "Vortex") {
+            const feed = document.getElementById('consoleFeed');
+            const now = new Date();
+            const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+            
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            line.innerHTML = `
+                <span class="log-time">${timeStr}</span>
+                <span class="log-tag">[${tag}]</span>
+                <span class="log-text">${text}</span>
+            `;
+            feed.appendChild(line);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        function setStatus(statusClass, label) {
+            const badge = document.getElementById('statusBadge');
+            badge.className = `console-status-badge ${statusClass}`;
+            badge.innerText = label;
+        }
+
+        function runAutopilotSequence() {
+            if (sequenceActive) return;
+            sequenceActive = true;
+
+            // Update UI buttons
+            document.getElementById('execute-btn').style.display = 'none';
+            document.getElementById('autopilot-btn').style.display = 'none';
+            document.getElementById('stop-btn').style.display = 'flex';
+
+            // Clear console
+            document.getElementById('consoleFeed').innerHTML = '';
+
+            // Step 1: Scan
+            setStatus('scanning', 'Scanning');
+            addLog("Initializing autonomous automation loop...", "Orchestrator");
+            addLog("Navigated to: https://wellfound.com/jobs/react-engineer", "Browser");
+            
+            timelineTimeout = setTimeout(() => {
+                addLog("Taking viewport high-fidelity screenshot...", "Extension");
+                
+                timelineTimeout = setTimeout(() => {
+                    addLog("Sending layout structure to Gemini 1.5 Flash for visual element parsing...", "LLM Model");
+                    
+                    timelineTimeout = setTimeout(() => {
+                        addLog("Gemini parsed 3 target job listing cards matching React / Node criteria.", "Gemini");
+                        
+                        // Begin Card 1 Automation
+                        automateJobCard(1);
+
+                    }, 1500);
+                }, 1200);
+            }, 1000);
+        }
+
+        function automateJobCard(cardId) {
+            if (!sequenceActive) return;
+            
+            setStatus('executing', `Job Card ${cardId}`);
+            addLog(`Step matched: Target Job ${cardId} ('Senior React Engineer' at 'Nova Labs')`, "Plan");
+            
+            const card = document.getElementById(`job-card-${cardId}`);
+            const btn = document.getElementById(`apply-btn-${cardId}`);
+            const cursor = document.getElementById('cursorPointer');
+
+            // Display cursor
+            cursor.style.display = 'block';
+
+            // Calculate card position offset relative to viewport
+            const rect = btn.getBoundingClientRect();
+            const viewportRect = document.querySelector('.web-viewport').getBoundingClientRect();
+            
+            const targetX = rect.left - viewportRect.left + (rect.width / 2);
+            const targetY = rect.top - viewportRect.top + (rect.height / 2);
+
+            timelineTimeout = setTimeout(() => {
+                addLog(`Moving virtual mouse pointer to coordinates: (x: ${Math.round(targetX)}, y: ${Math.round(targetY)})`, "Execute");
+                
+                // Move cursor
+                cursor.style.left = `${targetX}px`;
+                cursor.style.top = `${targetY}px`;
+
+                timelineTimeout = setTimeout(() => {
+                    // Click cursor animation
+                    cursor.classList.add('clicking');
+                    addLog(`Simulating human click sequence on Apply Button for card ${cardId}`, "Execute");
+
+                    timelineTimeout = setTimeout(() => {
+                        cursor.classList.remove('clicking');
+                        
+                        // Open modal
+                        document.getElementById('modal-job-title').innerText = `Apply to ${cardId === 1 ? 'Nova Labs' : 'Zenith Systems'}`;
+                        document.getElementById('wfModalOverlay').classList.add('active');
+                        document.getElementById('modal-coverletter').value = '';
+                        addLog("Viewport capture detected overlay form. Pausing coordinates tracking.", "Browser");
+
+                        // Autonomous cover letter typing simulation
+                        timelineTimeout = setTimeout(() => {
+                            simulateTyping(coverLetterTexts[cardId], 0, () => {
+                                // Typing complete, click submit button in modal
+                                addLog("Cover letter formulation fully completed.", "LLM Model");
+                                
+                                const submitBtn = document.getElementById('modal-submit-btn');
+                                const submitRect = submitBtn.getBoundingClientRect();
+                                const mTargetX = submitRect.left - viewportRect.left + (submitRect.width / 2);
+                                const mTargetY = submitRect.top - viewportRect.top + (submitRect.height / 2);
+
+                                timelineTimeout = setTimeout(() => {
+                                    // Move cursor to modal submit button
+                                    cursor.style.left = `${mTargetX}px`;
+                                    cursor.style.top = `${mTargetY}px`;
+
+                                    timelineTimeout = setTimeout(() => {
+                                        cursor.classList.add('clicking');
+                                        addLog("Submitting application details to Wellfound gateway...", "Execute");
+
+                                        timelineTimeout = setTimeout(() => {
+                                            cursor.classList.remove('clicking');
+                                            
+                                            // Close modal and show success toast
+                                            document.getElementById('wfModalOverlay').classList.remove('active');
+                                            btn.className = "wf-apply-btn applied";
+                                            btn.innerText = "Applied ✔";
+                                            
+                                            const toast = document.getElementById('wfToast');
+                                            toast.innerText = `Application Submitted to ${cardId === 1 ? 'Nova Labs' : 'Zenith Systems'}!`;
+                                            toast.classList.add('active');
+
+                                            addLog(`Application ${cardId} sent successfully! 100% confirmation from remote API.`, "Orchestrator");
+
+                                            timelineTimeout = setTimeout(() => {
+                                                toast.classList.remove('active');
+                                                cursor.style.display = 'none';
+
+                                                if (cardId === 1) {
+                                                    // Move to Job 2
+                                                    timelineTimeout = setTimeout(() => {
+                                                        automateJobCard(2);
+                                                    }, 1500);
+                                                } else {
+                                                    // Finished!
+                                                    completeSequence();
+                                                }
+                                            }, 2000);
+                                        }, 800);
+                                    }, 1000);
+                                }, 800);
+                            });
+                        }, 1000);
+                    }, 500);
+                }, 1000);
+            }, 500);
+        }
+
+        // Simulates keystrokes with human-like delayed typing intervals
+        function simulateTyping(text, index, callback) {
+            if (!sequenceActive) return;
+            const textarea = document.getElementById('modal-coverletter');
+            
+            if (index < text.length) {
+                textarea.value += text[index];
+                textarea.scrollTop = textarea.scrollHeight;
+                
+                const speed = Number(document.getElementById('param-typing').value);
+                const variance = (Math.random() * 0.4 + 0.8); // randomize delay to simulate human typing
+                
+                timelineTimeout = setTimeout(() => {
+                    simulateTyping(text, index + 1, callback);
+                }, speed * variance);
+            } else {
+                callback();
+            }
+        }
+
+        function completeSequence() {
+            setStatus('success', 'Completed');
+            addLog("Autonomous Autopilot Sequence completed successfully! applied to 2 target vacancies.", "Orchestrator");
+            addLog("Success rate: 100% (2/2). Logs persisted in database.", "Orchestrator");
+            
+            sequenceActive = false;
+            document.getElementById('execute-btn').style.display = 'flex';
+            document.getElementById('autopilot-btn').style.display = 'flex';
+            document.getElementById('stop-btn').style.display = 'none';
+        }
+
+        function stopSequence() {
+            if (timelineTimeout) clearTimeout(timelineTimeout);
+            sequenceActive = false;
+            
+            document.getElementById('cursorPointer').style.display = 'none';
+            document.getElementById('wfModalOverlay').classList.remove('active');
+            
+            setStatus('idle', 'Idle');
+            addLog("AUTOPILOT SEQUENCE ABORTED BY USER.", "Orchestrator");
+
+            document.getElementById('execute-btn').style.display = 'flex';
+            document.getElementById('autopilot-btn').style.display = 'flex';
+            document.getElementById('stop-btn').style.display = 'none';
+        }
+
+        // Manual visual modal triggers
+        function triggerManualApply(id) {
+            if (sequenceActive) return;
+            document.getElementById('modal-job-title').innerText = `Apply to ${id === 1 ? 'Nova Labs' : id === 2 ? 'Zenith Systems' : 'Vortex Tech'}`;
+            document.getElementById('wfModalOverlay').classList.add('active');
+            document.getElementById('modal-coverletter').value = "Manual Cover Letter Entry...";
+        }
+
+        function closeWfModal() {
+            document.getElementById('wfModalOverlay').classList.remove('active');
+        }
+
+        function submitWfApplication() {
+            document.getElementById('wfModalOverlay').classList.remove('active');
+            const toast = document.getElementById('wfToast');
+            toast.innerText = "Application Submitted Successfully (Manual)!";
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>

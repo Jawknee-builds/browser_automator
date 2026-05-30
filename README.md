@@ -7,6 +7,8 @@
 
 **AUTOMATOR AI** is a state-of-the-art autonomous browser agent designed to bridge the gap between AI reasoning and real-world web interaction. By combining **Groq’s ultra-fast LPU inference (Llama-3.3-70B)** with **Playwright’s industrial-grade automation**, it can "see," "think," and "act" on your behalf within any web application.
 
+👉 **[Live Clickable Interactive Autopilot Simulator](https://vortex-ai-ruddy.vercel.app/)**
+
 ---
 
 ## 🚀 The Core Problem & Solution
@@ -92,15 +94,14 @@ npm start
 
 ---
 
-## 🌩️ Production Deployment (Render)
-If you want to run the server orchestrator permanently in the cloud for remote API triggers or continuous background task queues:
+## 🌩️ Production Deployment (Vercel)
 
-1. Click the **Deploy to Render** button above or sign in to the [Render Dashboard](https://dashboard.render.com).
-2. Choose **Web Service** and deploy the `browser_automator` repository.
-3. Configure the following environment variables:
-   - `GROQ_API_KEY` = (Your active Groq Cloud Key)
-   - `PORT` = `3001`
-4. Click **Deploy**. Render will host your autonomous agent server for free.
+The simulator is fully optimized for 100% free, card-free, continuous serverless delivery:
+
+### Vercel Deployment (100% Free, NO Credit Card Required 🌟)
+1. Deploy the repository to **Vercel**.
+2. Vercel automatically detects the `vercel.json` and serves the interactive browser automation sandbox statically.
+3. Your premium, interactive simulator will be live under a secure, custom HTTPS domain instantly!
 
 ---
 

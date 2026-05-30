@@ -5,3 +5,4 @@ user_data/
 screenshot-*.png
 debug_response.txt
 *.log
+.vercel
