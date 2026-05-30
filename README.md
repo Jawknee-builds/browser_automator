@@ -3,7 +3,7 @@
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Groq Powered](https://img.shields.io/badge/LLM-Groq%20LPU-orange.svg)](https://groq.com)
 [![Playwright](https://img.shields.io/badge/Automation-Playwright-green.svg)](https://playwright.dev)
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?repository=github.com/Jawknee-builds/browser_automator&branch=main&name=browser-automator)
+[![Deploy to Render](https://render.com/images/deploy-to-render.svg)](https://render.com/deploy?repo=https://github.com/Jawknee-builds/browser_automator)
 
 **AUTOMATOR AI** is a state-of-the-art autonomous browser agent designed to bridge the gap between AI reasoning and real-world web interaction. By combining **Groq’s ultra-fast LPU inference (Llama-3.3-70B)** with **Playwright’s industrial-grade automation**, it can "see," "think," and "act" on your behalf within any web application.
 
@@ -92,15 +92,15 @@ npm start
 
 ---
 
-## 🌩️ Production Deployment (Koyeb)
+## 🌩️ Production Deployment (Render)
 If you want to run the server orchestrator permanently in the cloud for remote API triggers or continuous background task queues:
 
-1. Click the **Deploy to Koyeb** button above or sign in to [Koyeb](https://app.koyeb.com).
-2. Deploy the `browser_automator` repository.
+1. Click the **Deploy to Render** button above or sign in to the [Render Dashboard](https://dashboard.render.com).
+2. Choose **Web Service** and deploy the `browser_automator` repository.
 3. Configure the following environment variables:
    - `GROQ_API_KEY` = (Your active Groq Cloud Key)
    - `PORT` = `3001`
-4. Click **Deploy**. Koyeb will serve your AI agent orchestrator permanently on a public HTTPS domain.
+4. Click **Deploy**. Render will host your autonomous agent server for free.
 
 ---
 
